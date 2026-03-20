@@ -1,0 +1,5 @@
+# Bot Development Plan
+
+The bot will be built with a transport-independent architecture so that command logic can be tested without Telegram. The core idea is to keep handlers as plain Python functions that accept text input and return text output. A routing layer will parse commands and dispatch them to specific handlers. The Telegram integration layer will stay thin: it will only receive messages from Telegram, pass text into the router, and send the returned response back to the user.
+
+Phase 1 is scaffolding. This includes creating the bot directory, environment loader, command handlers, router, entry point, and offline test mode with `--test`. Phase 2 is backend integration. In this phase, `/health`, `/labs`, and `/scores` will call the LMS backend through a dedicated service client. Phase 3 is intent routing. Free-form user requests will be analyzed and routed either to command handlers or to an LLM-based intent classifier. Phase 4 is deployment and operations. The bot will be run on the VM with `uv`, configured via `.env.bot.secret`, and validated both in CLI mode and in Telegram. This structure keeps the project testable, modular, and easy to extend.
