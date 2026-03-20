@@ -8,6 +8,7 @@ from handlers.commands import (
     handle_scores,
     handle_start,
 )
+from services.llm_router import answer_with_tools
 
 
 def route_message(text: str) -> str:
@@ -26,4 +27,10 @@ def route_message(text: str) -> str:
         lab_id = parts[1] if len(parts) > 1 else None
         return handle_scores(lab_id)
 
-    return handle_fallback(text)
+    if text.startswith("/"):
+        return handle_fallback(text)
+
+    try:
+        return answer_with_tools(text)
+    except Exception as exc:
+        return f"LLM error: {exc}"

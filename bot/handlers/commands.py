@@ -18,7 +18,8 @@ def _client() -> LMSClient:
 def handle_start() -> str:
     return (
         "Welcome to LMS Bot.\n"
-        "Use /help to see available commands."
+        "I can show health status, labs, scores, learners, groups, and other analytics.\n"
+        "Use /help or just ask a question in plain English."
     )
 
 
@@ -29,7 +30,12 @@ def handle_help() -> str:
         "/help - list available commands\n"
         "/health - backend health status\n"
         "/labs - list available labs\n"
-        "/scores <lab> - show per-task pass rates"
+        "/scores <lab> - show per-task pass rates\n\n"
+        "Examples:\n"
+        "what labs are available?\n"
+        "show me scores for lab 4\n"
+        "how many students are enrolled\n"
+        "which lab has the lowest pass rate?"
     )
 
 
@@ -48,13 +54,22 @@ def handle_labs() -> str:
         return f"Backend error: {exc}. Check that the services are running."
 
     labs: dict[str, str] = {}
-    for item in items:
-        item_type = str(item.get("type", "")).lower()
-        slug = item.get("slug") or item.get("id") or item.get("code") or ""
-        title = item.get("title") or item.get("name") or slug
+    known_titles = {
+        "lab-01": "Products, Architecture & Roles",
+        "lab-02": "Run, Fix, and Deploy",
+        "lab-03": "Backend API",
+        "lab-04": "Testing, Front-end, and AI Agents",
+        "lab-05": "Data Pipeline and Analytics",
+        "lab-06": "Build Your Own Agent",
+    }
 
-        if item_type == "lab" or str(slug).startswith("lab-"):
-            labs[str(slug)] = str(title)
+    for item in items:
+        slug = str(item.get("slug") or item.get("id") or item.get("code") or "")
+        title = str(item.get("title") or item.get("name") or slug)
+
+        if slug.startswith("lab-"):
+            lab_slug = slug.split("/")[0]
+            labs[lab_slug] = known_titles.get(lab_slug, title)
 
     if not labs:
         return "No labs found."
