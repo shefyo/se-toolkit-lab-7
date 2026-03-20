@@ -13,3 +13,5 @@ __pycache__/
 tmp
 
 **/settings.local.jsonbot/bot.log
+
+bot/bot.log
